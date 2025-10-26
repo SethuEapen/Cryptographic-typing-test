@@ -2,41 +2,42 @@
 <html>
   <head>
     <meta charset="utf-8"/>
-    <title>Instance Page</title>
+    <title>MonkeyRand-Client</title>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>body{font-family:system-ui;margin:2rem} input{padding:.4rem}</style>
   </head>
   <body>
-    <h1>Instance</h1>
-    <label>Instance ID: <input id="iid" placeholder="abc-123" /></label>
-    <br/>
-    <label>Text value: <input id="val" placeholder="type something"/></label>
-    <p>Status: <span id="status">disconnected</span></p>
+    <h1>Client</h1>
+    <b>Socket.id</b>: <code id="sid">(connecting...)</code></p>
+
+    <label>Value to share:
+      <input id="val" placeholder="type here"/>
+    </label>
 
     <script>
-      const statusEl = document.getElementById("status");
-      const iidEl = document.getElementById("iid");
+      const sidEl = document.getElementById("sid");
       const valEl = document.getElementById("val");
 
-      // Connect when instanceId is set
-      let socket;
-      iidEl.addEventListener("change", () => {
-        if (socket) socket.disconnect();
-        socket = io("http://localhost:3000", { transports: ["websocket"] });
-        socket.on("connect", () => {
-          statusEl.textContent = "connected";
-          socket.emit("register", iidEl.value.trim());
-        });
-        socket.on("disconnect", () => statusEl.textContent = "disconnected");
+      const socket = io("http://localhost:3000", { transports: ["websocket"] });
 
-        // Handle RPC requests from server
-        socket.on("rpc:request", ({ requestId, event }) => {
-          if (event === "getData") {
-            const payload = { value: valEl.value };
-            socket.emit("rpc:response", { requestId, payload });
-          } else {
-            socket.emit("rpc:response", { requestId, error: `Unknown event ${event}` });
-          }
-        });
+      socket.on("connect", () => {
+        // You'll get a temporary client-side id immediately
+        sidEl.textContent = socket.id || "(pending)";
+      });
+
+      socket.on("server:assigned-id", ({ socketId }) => {
+        // Authoritative id from server (same as socket.id, but explicit)
+        sidEl.textContent = socketId;
+      });
+
+      // Answer RPCs from the server
+      socket.on("rpc:request", ({ requestId, event, payload }) => {
+        if (event === "getData") {
+          const value = valEl.value;
+          socket.emit("rpc:response", { requestId, payload: { value } });
+        } else {
+          socket.emit("rpc:response", { requestId, error: `unknown event ${event}` });
+        }
       });
     </script>
   </body>
