@@ -50,7 +50,7 @@ async function fillWordsDiv() {
         space.id = "space";
         space.classList.add("letter", "space")
         space.dataset.state = "pending"
-        space.textContent = "\u00A0"
+        space.textContent = " "
         newWord.appendChild(space)
         wordsDiv.appendChild(newWord)
 
@@ -78,15 +78,24 @@ async function runTest() {
         if (key === "Backspace") {
             console.log("Backspace pressed");
             if (letterIndex > 0) {
-                letters[letterIndex].dataset.state = "pending";
+                if (letters[letterIndex - 1].classList.contains("additionalFailed")) {
+                    words[wordIndex].removeChild(letters[letterIndex - 1])
+                    letters = words[wordIndex].querySelectorAll(".letter")
+                } else {
+                    letters[letterIndex].dataset.state = "pending";
+                    
+                }
                 letterIndex --;
+                letters[letterIndex].dataset.state = "active";
             } else if (lastIncorrect) { //go to end of last word
+                console.log("lastwasincorrect")
+                letters[letterIndex].dataset.state = "pending";
                 lastIncorrect = false;
                 wordIndex --;
                 letters = words[wordIndex].querySelectorAll(".letter")
-                letterIndex = letters.length
+                letterIndex = letters.length - 1
+                letters[letterIndex].dataset.state = "active";
             }
-            letters[letterIndex].dataset.state = "active";
         }
         else if (key === " ") {
             const current = letters[letterIndex];
@@ -96,16 +105,20 @@ async function runTest() {
                 current.dataset.state = "correct";
             } else {
                 current.dataset.state = "incorrect";
+                current.classList.add("skipped")
             }
-
+            lastIncorrect = false
             //check if word is correct
             for (let letter of letters) {
                 if (letter.dataset.state != "correct") {
                     lastIncorrect = true
+                    if (letter.dataset.state === "pending") {
+                        letter.classList.add("skipped")
+                    }
                     letter.dataset.state = "incorrect"
                 }
             }
-
+            console.log(letters)
             wordIndex++
             letters = words[wordIndex].querySelectorAll(".letter")
             letterIndex = 0
