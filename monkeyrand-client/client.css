@@ -1,0 +1,21 @@
+.word {
+  display: inline-flex; /* keeps all letters of a word on one line */
+  margin: 0 .6em;       /* space between words */
+}
+
+.letter {
+  display: inline-block; /* allows styling each letter individually */
+  font-size: 2em;
+  margin: 0em;
+}
+
+.letter.space {
+  width: 0.6em;           /* ensure visible width */
+  white-space: pre;       /* preserve the space character */
+  border-bottom: 1px solid transparent; /* keeps height consistent if others have underline */
+}
+
+.letter[data-state="correct"]   { color: green; }
+.letter[data-state="incorrect"] { color: red; }
+.letter[data-state="active"]    { border-bottom: 2px solid black; }
+.letter[data-state="pending"]   { opacity: 0.5; }

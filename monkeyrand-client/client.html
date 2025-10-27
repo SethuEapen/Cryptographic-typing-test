@@ -1,44 +1,23 @@
 <!doctype html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8"/>
-    <title>MonkeyRand-Client</title>
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <title>MonkeyRand</title>
+	<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <link rel="stylesheet" href="client.css">
     <style>body{font-family:system-ui;margin:2rem} input{padding:.4rem}</style>
-  </head>
-  <body>
+</head>
+<body>
     <h1>Client</h1>
     <b>Socket.id</b>: <code id="sid">(connecting...)</code></p>
 
     <label>Value to share:
-      <input id="val" placeholder="type here"/>
+    <input id="val" placeholder="type here"/>
     </label>
 
-    <script>
-      const sidEl = document.getElementById("sid");
-      const valEl = document.getElementById("val");
+    <div id="words"></div>
 
-      const socket = io("http://localhost:3000", { transports: ["websocket"] });
-
-      socket.on("connect", () => {
-        // You'll get a temporary client-side id immediately
-        sidEl.textContent = socket.id || "(pending)";
-      });
-
-      socket.on("server:assigned-id", ({ socketId }) => {
-        // Authoritative id from server (same as socket.id, but explicit)
-        sidEl.textContent = socketId;
-      });
-
-      // Answer RPCs from the server
-      socket.on("rpc:request", ({ requestId, event, payload }) => {
-        if (event === "getData") {
-          const value = valEl.value;
-          socket.emit("rpc:response", { requestId, payload: { value } });
-        } else {
-          socket.emit("rpc:response", { requestId, error: `unknown event ${event}` });
-        }
-      });
-    </script>
-  </body>
+    <script src="client.js"></script>
+	
+</body>
 </html>
