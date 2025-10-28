@@ -1,6 +1,11 @@
+body {
+  background-color: rgb(132, 190, 201);
+}
+
+
 .word {
   display: inline-flex; /* keeps all letters of a word on one line */
-  margin: 0 .6em;       /* space between words */
+  margin: 0 0em;       /* space between words */
 }
 
 .letter {
@@ -15,15 +20,9 @@
   border-bottom: 1px solid transparent; /* keeps height consistent if others have underline */
 }
 
-.letter[data-state="correct"]   { color: green; }
+.letter[data-state="correct"]   { color: rgb(38, 54, 58); }
 .letter[data-state="incorrect"] { color: red; }
 .letter[data-state="active"]    { border-bottom: 2px solid black; }
 .letter[data-state="pending"]   { opacity: 0.5; }
-
-.letter.additionalFailed {
-  color: darkred;
-}
-
-.letter.skipped {
-  opacity: 0;
-}
+.letter[data-state="additionalFailed"]    { color: darkred; }
+.letter[data-state="skipped"]   { color: red; opacity: 0.5; }

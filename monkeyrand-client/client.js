@@ -78,7 +78,7 @@ async function runTest() {
         if (key === "Backspace") {
             console.log("Backspace pressed");
             if (letterIndex > 0) {
-                if (letters[letterIndex - 1].classList.contains("additionalFailed")) {
+                if (letters[letterIndex - 1].dataset.state === "additionalFailed") {
                     words[wordIndex].removeChild(letters[letterIndex - 1])
                     letters = words[wordIndex].querySelectorAll(".letter")
                 } else {
@@ -88,12 +88,20 @@ async function runTest() {
                 letterIndex --;
                 letters[letterIndex].dataset.state = "active";
             } else if (lastIncorrect) { //go to end of last word
-                console.log("lastwasincorrect")
                 letters[letterIndex].dataset.state = "pending";
                 lastIncorrect = false;
                 wordIndex --;
                 letters = words[wordIndex].querySelectorAll(".letter")
+                
+                //find letter index
                 letterIndex = letters.length - 1
+                for (let i = 0; i < letters.length; i++) {
+                    if (letters[i].dataset.state === "skipped") {
+                        letterIndex = i
+                        break
+                    }
+                }
+                
                 letters[letterIndex].dataset.state = "active";
             }
         }
@@ -104,8 +112,7 @@ async function runTest() {
             if (key === expected) {
                 current.dataset.state = "correct";
             } else {
-                current.dataset.state = "incorrect";
-                current.classList.add("skipped")
+                current.dataset.state = "skipped";
             }
             lastIncorrect = false
             //check if word is correct
@@ -113,9 +120,8 @@ async function runTest() {
                 if (letter.dataset.state != "correct") {
                     lastIncorrect = true
                     if (letter.dataset.state === "pending") {
-                        letter.classList.add("skipped")
+                        letter.dataset.state = "skipped"
                     }
-                    letter.dataset.state = "incorrect"
                 }
             }
             console.log(letters)
@@ -140,8 +146,8 @@ async function runTest() {
                 letters[letterIndex].dataset.state = "active";
             } else {
                 const additionalFailed = document.createElement("span");
-                additionalFailed.classList.add("letter", "additionalFailed")
-                additionalFailed.dataset.state = "incorrect"
+                additionalFailed.classList.add("letter")
+                additionalFailed.dataset.state = "additionalFailed"
                 additionalFailed.textContent = key
                 words[wordIndex].insertBefore(additionalFailed, letters[letterIndex])
                 letterIndex++
